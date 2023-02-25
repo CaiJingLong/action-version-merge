@@ -1,0 +1,11 @@
+name: 'dio check changelog for pull request'
+description: 'Check the pull request must have a changelog'
+author: 'Your name or organization here'
+inputs:
+  github-token:
+    required: true
+    description: 'Github token'
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
