@@ -6,11 +6,9 @@ This action will create a release for a tag.
 
 When you push a tag to your repository, this action will create a release for that tag.
 
-In addition, the version will be merged into the main version.
+And, v1.0.0 will merge to v1.0 and v1 branch(if the branch not exists, create branch).
 
 Such as: if the tag is v1.0.0, the version will be merged into the v1.0 and v1 branch.
-
-Now, user use action just need to add `owner/repo@v1` or `owner/repo@v1.0` in their workflow file.
 
 ## Inputs
 
