@@ -60,7 +60,7 @@ function tryThrowError(str: shelljs.ShellString): shelljs.ShellString {
 function mergeToBranch(branch: string, tag: string): shelljs.ShellString {
   // Create branch if not exists
   const cmd = `
-  ${loginToken}
+  ${loginToken()}
   git checkout -b ${branch}
   git merge ${tag}
   git push origin ${branch}

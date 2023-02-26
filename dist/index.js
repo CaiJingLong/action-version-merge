@@ -70,7 +70,7 @@ function tryThrowError(str) {
 function mergeToBranch(branch, tag) {
     // Create branch if not exists
     const cmd = `
-  ${loginToken}
+  ${loginToken()}
   git checkout -b ${branch}
   git merge ${tag}
   git push origin ${branch}
