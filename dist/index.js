@@ -6,6 +6,29 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -20,6 +43,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const github_1 = __nccwpck_require__(1240);
+const core = __importStar(__nccwpck_require__(1680));
 const rest_1 = __nccwpck_require__(3306);
 const config_1 = __importDefault(__nccwpck_require__(1481));
 const semver_1 = __importDefault(__nccwpck_require__(5723));
@@ -38,13 +62,26 @@ function doAction() {
         const { owner, repo } = github_1.context.repo;
         // Get the default branch tags
         if (isRelease) {
-            yield github.repos.createRelease({
-                owner,
-                repo,
-                tag_name: tag,
-                name: tag,
-                generate_release_notes: true
-            });
+            // Check release exists
+            try {
+                github.repos.getReleaseByTag({
+                    owner,
+                    repo,
+                    tag
+                });
+            }
+            catch (e) {
+                const error = e;
+                if (error.status === 404) {
+                    yield github.repos.createRelease({
+                        owner,
+                        repo,
+                        tag_name: tag,
+                        name: tag,
+                        generate_release_notes: true
+                    });
+                }
+            }
         }
         if (!preRelease) {
             if (version.prerelease.length > 0) {
@@ -69,11 +106,12 @@ function tryThrowError(str) {
 function mergeToBranch(branch, tag) {
     // Create branch if not exists
     const cmd = `
-  ${loginToken}
+  ${loginToken()}
   git checkout -b ${branch}
   git merge ${tag}
   git push origin ${branch}
   `;
+    core.debug(cmd);
     return tryThrowError(shelljs_1.default.exec(cmd));
 }
 function loginToken() {
@@ -85,18 +123,6 @@ function loginToken() {
   gh auth setup-git --hostname github.com
   `;
 }
-
-
-/***/ }),
-
-/***/ 3059:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-function check() { }
-exports["default"] = check;
 
 
 /***/ }),
@@ -196,12 +222,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(1680));
 const github_1 = __nccwpck_require__(1240);
 const action_1 = __importDefault(__nccwpck_require__(6038));
-const check_1 = __importDefault(__nccwpck_require__(3059));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.debug(`context: ${JSON.stringify(github_1.context, null, 2)}`);
-            (0, check_1.default)();
             yield (0, action_1.default)();
         }
         catch (error) {

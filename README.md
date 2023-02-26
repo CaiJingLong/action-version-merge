@@ -40,4 +40,9 @@ jobs:
           release: true
           minor: true
           pre: true
+    permissions:
+      deployments: write
+      contents: write
+      packages: read
+
 ```

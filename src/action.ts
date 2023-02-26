@@ -1,4 +1,5 @@
 import {context} from '@actions/github'
+import * as core from '@actions/core'
 import {Octokit} from '@octokit/rest'
 import config from './config'
 import semver from 'semver'
@@ -7,6 +8,10 @@ import shelljs from 'shelljs'
 const github = new Octokit({
   auth: `token ${config.token}`
 })
+
+interface StatusError {
+  status: number
+}
 
 export default async function doAction(): Promise<void> {
   const tag = context.ref.replace('refs/tags/', '')
@@ -23,13 +28,25 @@ export default async function doAction(): Promise<void> {
   // Get the default branch tags
 
   if (isRelease) {
-    await github.repos.createRelease({
-      owner,
-      repo,
-      tag_name: tag,
-      name: tag,
-      generate_release_notes: true
-    })
+    // Check release exists
+    try {
+      github.repos.getReleaseByTag({
+        owner,
+        repo,
+        tag
+      })
+    } catch (e) {
+      const error = e as StatusError
+      if (error.status === 404) {
+        await github.repos.createRelease({
+          owner,
+          repo,
+          tag_name: tag,
+          name: tag,
+          generate_release_notes: true
+        })
+      }
+    }
   }
 
   if (!preRelease) {
@@ -59,11 +76,13 @@ function tryThrowError(str: shelljs.ShellString): shelljs.ShellString {
 function mergeToBranch(branch: string, tag: string): shelljs.ShellString {
   // Create branch if not exists
   const cmd = `
-  ${loginToken}
+  ${loginToken()}
   git checkout -b ${branch}
   git merge ${tag}
   git push origin ${branch}
   `
+
+  core.debug(cmd)
 
   return tryThrowError(shelljs.exec(cmd))
 }
