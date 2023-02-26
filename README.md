@@ -1,15 +1,43 @@
-# Template for github action
+# Github action for auto release for tag
 
-Default, use [pnpm](https://pnpm.io/) to manage dependencies and run scripts.
+This action will create a release for a tag.
 
-Use jest to run tests.
+## What it does
 
-## Use the template
+When you push a tag to your repository, this action will create a release for that tag.
 
-1. Click the `Use this template` button
-1. Create a new repository
-1. To do you own thing
+In addition, the version will be merged into the main version.
 
-## LICENSE
+Such as: if the tag is v1.0.0, the version will be merged into the v1.0 and v1 branch.
 
-[MIT](LICENSE)
+## Inputs
+
+| name    | description                                | default | required |
+| ------- | ------------------------------------------ | ------- | -------- |
+| token   | Github token                               | -       | true     |
+| release | if true, will create a release             | true    | true     |
+| minor   | if true, Such as v1.0.0 will merge to v1.0 | false   | true     |
+| pre     | The dev/pre version merge                  | false   | true     |
+
+## Example usage
+
+```yaml
+name: Tag to release
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Release
+        uses: caijinglong/action-version-merge
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release: true
+          minor: true
+          pre: true
+```

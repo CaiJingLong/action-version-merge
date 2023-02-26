@@ -1,18 +1,19 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import {context} from '@actions/github'
+import doAction from './action'
+import check from './check'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
-
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    core.setOutput('time', new Date().toTimeString())
+    core.debug(`context: ${JSON.stringify(context, null, 2)}`)
+    check()
+    await doAction()
   } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    } else {
+      core.setFailed(`Unkown error: ${error}`)
+    }
   }
 }
 

@@ -1,11 +1,22 @@
-name: 'dio check changelog for pull request'
-description: 'Check the pull request must have a changelog'
+name: 'Merge to major and minor version'
+description: 'When tag is created, merge to major and minor version'
 author: 'Your name or organization here'
 inputs:
   github-token:
     required: true
     description: 'Github token'
-
+  release:
+    required: true
+    description: 'If true, will create a git release'
+    default: 'true'
+  minor:
+    required: true
+    description: 'If true, the v1.0 branch will be merge'
+    default: 'true'
+  pre:
+    required: true
+    description: 'If true, the v1.0.0-rc branch will be merge'
+    default: 'false'
 runs:
   using: 'node16'
   main: 'dist/index.js'
