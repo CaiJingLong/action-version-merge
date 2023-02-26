@@ -83,7 +83,7 @@ function getBooleanInput(name) {
     return core.getInput(name) === 'true';
 }
 function getConfig() {
-    const token = core.getInput('token', { required: true });
+    const token = core.getInput('github-token', { required: true });
     const release = getBooleanInput('release');
     const minor = getBooleanInput('minor');
     const preRelease = getBooleanInput('pre-release');

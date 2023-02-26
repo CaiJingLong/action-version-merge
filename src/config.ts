@@ -36,7 +36,7 @@ function getBooleanInput(name: string): boolean {
 }
 
 function getConfig(): Config {
-  const token = core.getInput('token', {required: true})
+  const token = core.getInput('github-token', {required: true})
   const release = getBooleanInput('release')
   const minor = getBooleanInput('minor')
   const preRelease = getBooleanInput('pre-release')
