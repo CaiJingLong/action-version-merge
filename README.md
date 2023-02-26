@@ -10,6 +10,8 @@ In addition, the version will be merged into the main version.
 
 Such as: if the tag is v1.0.0, the version will be merged into the v1.0 and v1 branch.
 
+Now, user use action just need to add `owner/repo@v1` or `owner/repo@v1.0` in their workflow file.
+
 ## Inputs
 
 | name    | description                                | default | required |
@@ -34,12 +36,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Release
-        uses: caijinglong/action-version-merge
+        uses: caijinglong/action-version-merge@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          release: true
-          minor: true
-          pre: true
     permissions:
       deployments: write
       contents: write
