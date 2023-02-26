@@ -1,6 +1,6 @@
-name: 'Merge to major and minor version'
-description: 'When tag is created, merge to major and minor version'
-author: 'Your name or organization here'
+name: 'merge-version'
+description: 'When tag is created, merge to major and minor version branch'
+author: 'Caijinglong'
 inputs:
   github-token:
     required: true
