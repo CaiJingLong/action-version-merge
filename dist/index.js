@@ -23,6 +23,7 @@ const github_1 = __nccwpck_require__(1240);
 const rest_1 = __nccwpck_require__(3306);
 const config_1 = __importDefault(__nccwpck_require__(1481));
 const semver_1 = __importDefault(__nccwpck_require__(5723));
+const core_1 = __nccwpck_require__(1680);
 const github = new rest_1.Octokit({
     auth: `token ${config_1.default.token}`
 });
@@ -30,6 +31,7 @@ function doAction() {
     return __awaiter(this, void 0, void 0, function* () {
         const tag = github_1.context.ref.replace('refs/tags/', '');
         const sha = github_1.context.sha;
+        (0, core_1.info)(`Current tag: ${tag}, sha: ${sha}`);
         const version = semver_1.default.parse(tag);
         if (version === null) {
             throw new Error(`Invalid tag: ${tag}`);
@@ -38,6 +40,7 @@ function doAction() {
         const { owner, repo } = github_1.context.repo;
         // Get the default branch tags
         if (isRelease) {
+            (0, core_1.info)(`Create release: ${tag}`);
             // Check release exists
             try {
                 yield github.repos.getReleaseByTag({
@@ -45,10 +48,12 @@ function doAction() {
                     repo,
                     tag
                 });
+                (0, core_1.info)(`Release ${tag} already exists, skip create.`);
             }
             catch (e) {
                 const error = e;
                 if (error.status === 404) {
+                    (0, core_1.info)(`Release ${tag} not exists, create it.`);
                     yield github.repos.createRelease({
                         owner,
                         repo,
@@ -56,10 +61,15 @@ function doAction() {
                         name: tag,
                         generate_release_notes: true
                     });
+                    (0, core_1.info)(`Release ${tag} created.`);
+                }
+                else {
+                    throw e;
                 }
             }
         }
         if (!preRelease) {
+            (0, core_1.info)(`Because input pre is false, skip merge to branch.`);
             if (version.prerelease.length > 0) {
                 return;
             }
@@ -70,37 +80,48 @@ function doAction() {
         if (isMinor) {
             yield mergeToBranch(`v${major}.${minor}`, tag, sha);
         }
+        (0, core_1.info)(`Action done.`);
     });
 }
 exports["default"] = doAction;
 function mergeToBranch(branch, tag, sha) {
     return __awaiter(this, void 0, void 0, function* () {
+        (0, core_1.info)(`Prepare merge ${tag} -> ${branch}...`);
         const { owner, repo } = github_1.context.repo;
         // Check branch exists
         try {
+            (0, core_1.info)(`Check branch ${branch} exists...`);
             yield github.repos.getBranch({
                 owner,
                 repo,
                 branch
             });
+            (0, core_1.info)(`Branch ${branch} exists. Skip create.`);
         }
         catch (e) {
             const error = e;
             if (error.status === 404) {
+                (0, core_1.info)(`Branch ${branch} not exists, create it.`);
                 yield github.git.createRef({
                     owner,
                     repo,
                     ref: `refs/heads/${branch}`,
                     sha
                 });
+                (0, core_1.info)(`Branch ${branch} created.`);
+            }
+            else {
+                throw e;
             }
         }
+        (0, core_1.info)(`Merge ${tag} -> ${branch}...`);
         yield github.repos.merge({
             owner,
             repo,
             base: branch,
             head: tag
         });
+        (0, core_1.info)(`Merge ${tag} -> ${branch} done.`);
     });
 }
 
