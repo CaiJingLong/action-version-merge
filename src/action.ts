@@ -13,6 +13,7 @@ interface StatusError {
 
 export default async function doAction(): Promise<void> {
   const tag = context.ref.replace('refs/tags/', '')
+  const sha = context.sha
 
   const version = semver.parse(tag)
 
@@ -56,14 +57,18 @@ export default async function doAction(): Promise<void> {
   const {major, minor} = version
 
   // Create major branch
-  await mergeToBranch(`v${major}`, tag)
+  await mergeToBranch(`v${major}`, tag, sha)
 
   if (isMinor) {
-    await mergeToBranch(`v${major}.${minor}`, tag)
+    await mergeToBranch(`v${major}.${minor}`, tag, sha)
   }
 }
 
-async function mergeToBranch(branch: string, tag: string): Promise<void> {
+async function mergeToBranch(
+  branch: string,
+  tag: string,
+  sha: string
+): Promise<void> {
   const {owner, repo} = context.repo
   // Check branch exists
   try {
@@ -75,11 +80,11 @@ async function mergeToBranch(branch: string, tag: string): Promise<void> {
   } catch (e) {
     const error = e as StatusError
     if (error.status === 404) {
-      github.git.createRef({
+      await github.git.createRef({
         owner,
         repo,
         ref: `refs/heads/${branch}`,
-        sha: tag
+        sha
       })
     }
   }

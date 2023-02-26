@@ -29,6 +29,7 @@ const github = new rest_1.Octokit({
 function doAction() {
     return __awaiter(this, void 0, void 0, function* () {
         const tag = github_1.context.ref.replace('refs/tags/', '');
+        const sha = github_1.context.sha;
         const version = semver_1.default.parse(tag);
         if (version === null) {
             throw new Error(`Invalid tag: ${tag}`);
@@ -65,14 +66,14 @@ function doAction() {
         }
         const { major, minor } = version;
         // Create major branch
-        yield mergeToBranch(`v${major}`, tag);
+        yield mergeToBranch(`v${major}`, tag, sha);
         if (isMinor) {
-            yield mergeToBranch(`v${major}.${minor}`, tag);
+            yield mergeToBranch(`v${major}.${minor}`, tag, sha);
         }
     });
 }
 exports["default"] = doAction;
-function mergeToBranch(branch, tag) {
+function mergeToBranch(branch, tag, sha) {
     return __awaiter(this, void 0, void 0, function* () {
         const { owner, repo } = github_1.context.repo;
         // Check branch exists
@@ -86,11 +87,11 @@ function mergeToBranch(branch, tag) {
         catch (e) {
             const error = e;
             if (error.status === 404) {
-                github.git.createRef({
+                yield github.git.createRef({
                     owner,
                     repo,
                     ref: `refs/heads/${branch}`,
-                    sha: tag
+                    sha
                 });
             }
         }
