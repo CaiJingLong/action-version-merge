@@ -18,4 +18,8 @@ test('version log', () => {
   expect(version.patch).toBe(3)
   expect(version.version).toBe('1.2.3-alpha.5')
   expect(semver.coerce('1.2.3-alpha.5')?.version).toEqual('1.2.3')
+
+  expect(version.prerelease.length).toBe(2)
+  expect(semver.prerelease('1.2.3-alpha.5')?.length).not.toBe(0)
+  expect(semver.parse('1.2.3')?.prerelease.length).toBe(0)
 })
