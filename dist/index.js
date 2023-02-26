@@ -108,6 +108,7 @@ function mergeToBranch(branch, tag) {
     const cmd = `
   ${loginToken()}
   git checkout -b origin/${branch}
+  git fetch
   git merge ${tag}
   git push -u origin ${branch}
   `;
