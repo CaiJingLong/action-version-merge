@@ -80,7 +80,7 @@ async function mergeToBranch(
   } catch (e) {
     const error = e as StatusError
     if (error.status === 404) {
-      github.git.createRef({
+      await github.git.createRef({
         owner,
         repo,
         ref: `refs/heads/${branch}`,

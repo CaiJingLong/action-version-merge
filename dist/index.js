@@ -87,7 +87,7 @@ function mergeToBranch(branch, tag, sha) {
         catch (e) {
             const error = e;
             if (error.status === 404) {
-                github.git.createRef({
+                yield github.git.createRef({
                     owner,
                     repo,
                     ref: `refs/heads/${branch}`,
