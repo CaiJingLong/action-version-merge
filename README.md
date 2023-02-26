@@ -1,14 +1,14 @@
-# Github action for auto release for tag
+# Github action for auto release with tag
 
-This action will create a release for a tag.
+This action will create a release with a tag.
 
-## What it does
+When the tag v1.0.0 pushed, the action will create a release with the tag v1.0.0.
 
-When you push a tag to your repository, this action will create a release for that tag.
+And the action will merge the tag to the v1.0 and v1 branch. If the branch v1.0 not exists, the action will create it.
 
-And, v1.0.0 will merge to v1.0 and v1 branch(if the branch not exists, create branch).
+----
 
-Such as: if the tag is v1.0.0, the version will be merged into the v1.0 and v1 branch.
+If the repo is github action, user can use owner/action@v1 to use the action.
 
 ## Inputs
 
@@ -26,7 +26,7 @@ name: Tag to release
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -37,7 +37,7 @@ jobs:
         uses: caijinglong/action-version-merge@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-    permissions:
+    permissions: # Required, because the action will create a release and branch, so need write permission
       deployments: write
       contents: write
       packages: read
