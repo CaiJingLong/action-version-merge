@@ -39,13 +39,26 @@ function doAction() {
         const { owner, repo } = github_1.context.repo;
         // Get the default branch tags
         if (isRelease) {
-            yield github.repos.createRelease({
-                owner,
-                repo,
-                tag_name: tag,
-                name: tag,
-                generate_release_notes: true
-            });
+            // Check release exists
+            try {
+                github.repos.getReleaseByTag({
+                    owner,
+                    repo,
+                    tag
+                });
+            }
+            catch (e) {
+                const error = e;
+                if (error.status === 404) {
+                    yield github.repos.createRelease({
+                        owner,
+                        repo,
+                        tag_name: tag,
+                        name: tag,
+                        generate_release_notes: true
+                    });
+                }
+            }
         }
         if (!preRelease) {
             if (version.prerelease.length > 0) {
