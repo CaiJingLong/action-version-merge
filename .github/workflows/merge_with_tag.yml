@@ -16,3 +16,5 @@ jobs:
           release: true
           minor: true
           pre: false
+    permissions:
+      deployments: write
