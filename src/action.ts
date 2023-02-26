@@ -1,9 +1,7 @@
 import {context} from '@actions/github'
-import * as core from '@actions/core'
 import {Octokit} from '@octokit/rest'
 import config from './config'
 import semver from 'semver'
-import shelljs from 'shelljs'
 
 const github = new Octokit({
   auth: `token ${config.token}`
@@ -30,7 +28,7 @@ export default async function doAction(): Promise<void> {
   if (isRelease) {
     // Check release exists
     try {
-      github.repos.getReleaseByTag({
+      await github.repos.getReleaseByTag({
         owner,
         repo,
         tag
@@ -58,42 +56,38 @@ export default async function doAction(): Promise<void> {
   const {major, minor} = version
 
   // Create major branch
-  mergeToBranch(`v${major}`, tag)
+  await mergeToBranch(`v${major}`, tag)
 
   if (isMinor) {
-    mergeToBranch(`v${major}.${minor}`, tag)
+    await mergeToBranch(`v${major}.${minor}`, tag)
   }
 }
 
-function tryThrowError(str: shelljs.ShellString): shelljs.ShellString {
-  if (str.code !== 0) {
-    throw new Error(str.stderr)
+async function mergeToBranch(branch: string, tag: string): Promise<void> {
+  const {owner, repo} = context.repo
+  // Check branch exists
+  try {
+    await github.repos.getBranch({
+      owner,
+      repo,
+      branch
+    })
+  } catch (e) {
+    const error = e as StatusError
+    if (error.status === 404) {
+      github.git.createRef({
+        owner,
+        repo,
+        ref: `refs/heads/${branch}`,
+        sha: tag
+      })
+    }
   }
 
-  return str
-}
-
-function mergeToBranch(branch: string, tag: string): shelljs.ShellString {
-  // Create branch if not exists
-  const cmd = `
-  ${loginToken()}
-  git checkout -b ${branch}
-  git merge ${tag}
-  git push origin ${branch}
-  `
-
-  core.debug(cmd)
-
-  return tryThrowError(shelljs.exec(cmd))
-}
-
-function loginToken(): string {
-  const token = config.token
-
-  // login with token
-  return `git config --global user.name "github-actions[bot]"
-  git config --global user.email "github-actions[bot]@users.noreply.github.com"
-  echo "${token}" | gh auth login --with-token --hostname github.com
-  gh auth setup-git --hostname github.com
-  `
+  await github.repos.merge({
+    owner,
+    repo,
+    base: branch,
+    head: tag
+  })
 }
