@@ -32,11 +32,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Release
         uses: caijinglong/action-version-merge@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          github-token:: ${{ secrets.GITHUB_TOKEN }}
     permissions: # Required, because the action will create a release and branch, so need write permission
       deployments: write
       contents: write
