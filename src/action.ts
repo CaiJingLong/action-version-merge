@@ -2,6 +2,7 @@ import {context} from '@actions/github'
 import {Octokit} from '@octokit/rest'
 import config from './config'
 import semver from 'semver'
+import {info as log} from '@actions/core'
 
 const github = new Octokit({
   auth: `token ${config.token}`
@@ -15,6 +16,8 @@ export default async function doAction(): Promise<void> {
   const tag = context.ref.replace('refs/tags/', '')
   const sha = context.sha
 
+  log(`Current tag: ${tag}, sha: ${sha}`)
+
   const version = semver.parse(tag)
 
   if (version === null) {
@@ -27,6 +30,8 @@ export default async function doAction(): Promise<void> {
   // Get the default branch tags
 
   if (isRelease) {
+    log(`Create release: ${tag}`)
+
     // Check release exists
     try {
       await github.repos.getReleaseByTag({
@@ -34,9 +39,12 @@ export default async function doAction(): Promise<void> {
         repo,
         tag
       })
+
+      log(`Release ${tag} already exists, skip create.`)
     } catch (e) {
       const error = e as StatusError
       if (error.status === 404) {
+        log(`Release ${tag} not exists, create it.`)
         await github.repos.createRelease({
           owner,
           repo,
@@ -44,11 +52,15 @@ export default async function doAction(): Promise<void> {
           name: tag,
           generate_release_notes: true
         })
+        log(`Release ${tag} created.`)
+      } else {
+        throw e
       }
     }
   }
 
   if (!preRelease) {
+    log(`Because input pre is false, skip merge to branch.`)
     if (version.prerelease.length > 0) {
       return
     }
@@ -62,6 +74,8 @@ export default async function doAction(): Promise<void> {
   if (isMinor) {
     await mergeToBranch(`v${major}.${minor}`, tag, sha)
   }
+
+  log(`Action done.`)
 }
 
 async function mergeToBranch(
@@ -69,30 +83,40 @@ async function mergeToBranch(
   tag: string,
   sha: string
 ): Promise<void> {
+  log(`Prepare merge ${tag} -> ${branch}...`)
   const {owner, repo} = context.repo
   // Check branch exists
   try {
+    log(`Check branch ${branch} exists...`)
     await github.repos.getBranch({
       owner,
       repo,
       branch
     })
+    log(`Branch ${branch} exists. Skip create.`)
   } catch (e) {
     const error = e as StatusError
     if (error.status === 404) {
+      log(`Branch ${branch} not exists, create it.`)
       await github.git.createRef({
         owner,
         repo,
         ref: `refs/heads/${branch}`,
         sha
       })
+      log(`Branch ${branch} created.`)
+    } else {
+      throw e
     }
   }
 
+  log(`Merge ${tag} -> ${branch}...`)
   await github.repos.merge({
     owner,
     repo,
     base: branch,
     head: tag
   })
+
+  log(`Merge ${tag} -> ${branch} done.`)
 }
