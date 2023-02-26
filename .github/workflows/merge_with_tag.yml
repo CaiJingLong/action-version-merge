@@ -10,6 +10,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Release from tag
-        uses: caijinglong/action-version-merge
+        uses: caijinglong/action-version-merge@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          release: true
+          minor: true
+          pre: false
