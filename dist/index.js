@@ -107,9 +107,9 @@ function mergeToBranch(branch, tag) {
     // Create branch if not exists
     const cmd = `
   ${loginToken()}
-  git checkout -b ${branch}
+  git checkout -b origin/${branch}
   git merge ${tag}
-  git push origin ${branch}
+  git push -u origin ${branch}
   `;
     core.debug(cmd);
     return tryThrowError(shelljs_1.default.exec(cmd));
