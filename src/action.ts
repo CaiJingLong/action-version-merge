@@ -1,4 +1,5 @@
 import {context} from '@actions/github'
+import core from '@actions/core'
 import {Octokit} from '@octokit/rest'
 import config from './config'
 import semver from 'semver'
@@ -64,6 +65,8 @@ function mergeToBranch(branch: string, tag: string): shelljs.ShellString {
   git merge ${tag}
   git push origin ${branch}
   `
+
+  core.debug(cmd)
 
   return tryThrowError(shelljs.exec(cmd))
 }

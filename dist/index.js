@@ -20,6 +20,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const github_1 = __nccwpck_require__(1240);
+const core_1 = __importDefault(__nccwpck_require__(1680));
 const rest_1 = __nccwpck_require__(3306);
 const config_1 = __importDefault(__nccwpck_require__(1481));
 const semver_1 = __importDefault(__nccwpck_require__(5723));
@@ -74,6 +75,7 @@ function mergeToBranch(branch, tag) {
   git merge ${tag}
   git push origin ${branch}
   `;
+    core_1.default.debug(cmd);
     return tryThrowError(shelljs_1.default.exec(cmd));
 }
 function loginToken() {
@@ -85,18 +87,6 @@ function loginToken() {
   gh auth setup-git --hostname github.com
   `;
 }
-
-
-/***/ }),
-
-/***/ 3059:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-function check() { }
-exports["default"] = check;
 
 
 /***/ }),
@@ -196,12 +186,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(1680));
 const github_1 = __nccwpck_require__(1240);
 const action_1 = __importDefault(__nccwpck_require__(6038));
-const check_1 = __importDefault(__nccwpck_require__(3059));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.debug(`context: ${JSON.stringify(github_1.context, null, 2)}`);
-            (0, check_1.default)();
             yield (0, action_1.default)();
         }
         catch (error) {
