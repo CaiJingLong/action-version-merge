@@ -28,7 +28,7 @@ export default async function doAction(): Promise<void> {
   if (isRelease) {
     // Check release exists
     try {
-      github.repos.getReleaseByTag({
+      await github.repos.getReleaseByTag({
         owner,
         repo,
         tag

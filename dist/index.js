@@ -39,7 +39,7 @@ function doAction() {
         if (isRelease) {
             // Check release exists
             try {
-                github.repos.getReleaseByTag({
+                yield github.repos.getReleaseByTag({
                     owner,
                     repo,
                     tag
