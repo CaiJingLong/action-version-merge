@@ -60,8 +60,8 @@ export default async function doAction(): Promise<void> {
   }
 
   if (!preRelease) {
-    log(`Because input pre is false, skip merge to branch.`)
     if (version.prerelease.length > 0) {
+      log(`Because input pre is false, skip merge to branch.`)
       return
     }
   }
