@@ -69,8 +69,8 @@ function doAction() {
             }
         }
         if (!preRelease) {
-            (0, core_1.info)(`Because input pre is false, skip merge to branch.`);
             if (version.prerelease.length > 0) {
+                (0, core_1.info)(`Because input pre is false, skip merge to branch.`);
                 return;
             }
         }

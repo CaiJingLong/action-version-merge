@@ -36,7 +36,7 @@ jobs:
       - name: Release
         uses: caijinglong/action-version-merge@v1
         with:
-          github-token:: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
     permissions: # Required, because the action will create a release and branch, so need write permission
       deployments: write
       contents: write
