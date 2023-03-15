@@ -8,7 +8,7 @@ bump_version:
 dist:
 	pnpm run dist
 
-commit:
+push:
 	git add .
 	git commit -m ":hammer: Update docs or scripts"
 	git push
