@@ -6,4 +6,8 @@ Makefile have some scripts to help quickly.
 
 ## Makefile
 
-make 
+- bump_version
+  1. bump version
+  1. update package.json
+  1. git commit
+  1. git push
