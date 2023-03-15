@@ -7,3 +7,14 @@ bump_version:
 
 dist:
 	pnpm run dist
+
+commit:
+	git add .
+	git commit -m ":hammer: Update docs or scripts"
+	git push
+
+clean:
+	rm -rf lib
+	rm -rf dist
+
+.PHONY: bump_version dist clean commit
