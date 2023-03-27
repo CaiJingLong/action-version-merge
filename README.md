@@ -12,12 +12,12 @@ If the repo is github action, user can use owner/action@v1 to use the action.
 
 ## Inputs
 
-| name    | description                                | default | required |
-| ------- | ------------------------------------------ | ------- | -------- |
-| token   | Github token                               | -       | true     |
-| release | if true, will create a release             | true    | true     |
-| minor   | if true, Such as v1.0.0 will merge to v1.0 | false   | true     |
-| pre     | The dev/pre version merge                  | false   | true     |
+| name            | description                                | default | required |
+| ----------------| ------------------------------------------ | ------- | -------- |
+| github-token    | Github token                               | -       | true     |
+| release         | if true, will create a release             | true    | true     |
+| minor           | if true, Such as v1.0.0 will merge to v1.0 | false   | true     |
+| pre             | The dev/pre version merge                  | false   | true     |
 
 ## Example usage
 
